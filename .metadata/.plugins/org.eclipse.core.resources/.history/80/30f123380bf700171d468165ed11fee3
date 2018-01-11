@@ -28,19 +28,14 @@ public class Film {
 	private Date premierDate;
 	
 	private String producer;
-	
 	@ManyToOne
 	private Country country;
-	
 	@ManyToOne
 	private Genre genre;
-	
 	@ManyToOne
 	private AgeRating ageRating;
-	
 	@ManyToOne
 	private Studio studio;
-	
 	@ManyToMany
 	@JoinTable(name="actors_film", joinColumns= @JoinColumn(name= "id_films"),inverseJoinColumns = @JoinColumn(name = "id_actors") )
 	private List<Actors> actors= new ArrayList<Actors>();
