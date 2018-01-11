@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Admin</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body background="image/bd2.png">
+
+
+    <header>
+
+        <div class="topnav" id="myTopnav">
+            <h2>Movie Blog</h2>
+            <a href="index.html">Home</a>
+            <a href="#films">Films</a>
+            <a href="about.html">About</a>
+            <a id="sign" href="sign_up.html">Sign up</a>
+        </div>
+    </header>
+    <div class="container" id="main">
+
+        <div class="addBox">
+            <h3>Countries</h3>
+            <ul id="countries">
+
+            </ul>
+            <h3>Add Country</h3>
+            <label>Country</label>
+            <input type="text" id="country">
+            <button id="addCountry" class="button">Add</button>
+        </div>
+
+        <div class="addBox">
+            <h3>Age Ratings</h3>
+            <ul id="ageRatings">
+
+            </ul>
+            <h3>Add AgeRatings</h3>
+            <label>Age Rating</label>
+            <input type="text" id="ageRating">
+            <button id="addAgeRating" class="button">Add</button>
+        </div>
+
+        <div class="addBox">
+            <h3>Actors</h3>
+            <ul id="actors">
+
+            </ul>
+            <h3>Add Actors</h3>
+            <label>First name</label>
+            <input type="text" id="actorsFirstName">
+            <label>Second name</label>
+            <input type="text" id="actorsLastName">
+            <label>Age</label>
+            <input type="number" id="actorsAge">
+            <button id="addActor" class="button">Add</button>
+        </div>
+
+        <div class="addBox">
+            <h3>Genres</h3>
+            <ul id="genres">
+
+            </ul>
+            <h3>Add Genre</h3>
+            <label>Genre</label>
+            <input type="text" id="genre">
+            <button id="addGenre" class="button">Add</button>
+        </div>
+
+
+        <div class="addBox">
+            <h3>Studios</h3>
+            <ul id="studios">
+
+            </ul>
+            <h3>Add Studio</h3>
+            <label>Studio</label>
+            <input type="text" required id="studio">
+            <button id="addStudio" class="button">Add</button>
+        </div>
+
+        <div class="addBox">
+            <h3>Films</h3>
+            <ul id="films">
+
+            </ul>
+            <h3>Add Film</h3>
+
+
+            <label>Film</label>
+            <input type="text" id="filmName">
+
+
+
+            <label>Film rating</label>
+            <select id="filmRating">
+            <option>1.0</option>
+            <option>1.5</option>
+            <option>2.0</option>
+            <option>2.5</option>
+            <option>3.0</option>
+            <option>3.5</option>
+            <option>4.0</option>
+            <option>4.5</option>
+            <option>5.0</option>
+            </select>
+
+
+
+            <label>Premier date</label>
+            <input type="date" id="premierDate">
+
+
+
+            <label>Producer</label>
+            <input type="text" id="producer">
+
+
+            <button id="addFilm" class="button">Add</button>
+        </div>
+
+        <div class="addBox">
+            <h3>Users</h3>
+            <ul id="users">
+
+            </ul>
+            <h3>Add User</h3>
+
+            <label>Enter email</label>
+            <input type="email" id="email"><br>
+
+
+            <label>Enter password</label>
+            <input type="password" id="password"><br>
+
+
+            <label>Enter nickname</label>
+            <input type="text" id="nickname"><br>
+
+
+            <label>Enter your first name </label>
+            <input type="text" id="firstName"><br>
+
+
+            <label>Enter your last name</label>
+            <input type="text" id="lastName"><br>
+
+
+            <label>Select role</label>
+            <select id="role">
+                <option value="ROLE_USER">User</option>
+                <option value="ROLE_ADMIN">Admin</option>
+                </select>
+
+
+
+            <button id="addUser" class="button">Add</button>
+        </div>
+
+    </div>
+
+    <script>
+        function getCountries() {
+            $.ajax({
+                'url': 'http://localhost:8080/country',
+                'type': "GET",
+                'contentType': 'application/json',
+                'success': function(data) {
+                    for (var i = 0; i < data.length; i++) {
+                        var country = $('#countries');
+                        country.append('<li>' + data[i].name + '</li>');
+                        country.append('<button class="deleteCountry" id="button" value="' + data[i].id + '">Delete</button>')
+
+                    }
+                    setClickOnDeleteCountry();
+                },
+                'error': function(error) {
+                    alert(JSON.parse(error.responseText).message);
+                }
+            });
+        }
+        getCountries();
+
+
+        $('#addCountry').click(function() {
+            var name = $('#country').val();
+
+            $.ajax({
+                'url': 'http://localhost:8080/country',
+                'type': "PUT",
+                'contentType': 'application/json',
+                'dataType': 'json',
+                'data': JSON.stringify(name),
+                'success': function(data) {
+                    for (var i = 0; i < data.length; i++) {
+                        var country = $('#countries');
+                        country.append('<li>' + data[i].name + '</li>');
+                        country.append('<button  class="deleteCountry" id="button" value="' + data[i].id + '">Delete</button>')
+                        setClickOnDeleteCountry();
+
+                    }
+                    location.reload();
+                },
+                'error': function(error) {
+                    alert(JSON.parse(error.responseText).message);
+                }
+            })
+        })
+
+
+        function setClickOnDeleteCountry() {
+            $('.deleteCountry').click(function() {
+                var token = sessionStorage.getItem('A-Token')
+                var deleteCountry = {
+                    'id': this.value
+                }
+                console.log(deleteCountry)
+                $.ajax({
+                    'url': 'http://localhost:8080/country',
+                    'type': "DELETE",
+                    'contentType': 'application/json',
+                    'dataType': 'json',
+                    'data': JSON.stringify(deleteCountry),
+                    'headers': {
+                        'A-token': token
+
+                    },
+                    'success': function() {
+                        $('#countries').empty();
+                        getCountries();
+                    },
+                    'error': function(error) {
+                        alert(JSON.parse(error.responseText).message);
+                    }
+
+                })
+            })
+        }
+
+
+        function getAgeRatings() {
+            $.ajax({
+                'url': 'http://localhost:8080/ageRating',
+                'type': "GET",
+                'contentType': 'application/json',
+                'success': function(data) {
+                    for (var i = 0; i < data.length; i++) {
+                        var ageRating = $('#ageRatings');
+                        ageRating.append('<li>' + data[i].ageRatingName + '</li>');
+                        ageRating.append('<button class="deleteAgeRating" id="button" value="' + data[i].id + '">Delete</button>')
+
+                    }
+                    setClickOnDeleteAgeRating();
+                },
+                'error': function(error) {
+                    alert(JSON.parse(error.responseText).message);
+                }
+            });
+        }
+        getAgeRatings();
+
+        $('#addAgeRating').click(function() {
+            var name = $('#ageRating').val();
+
+            $.ajax({
+                'url': 'http://localhost:8080/ageRating',
+                'type': "PUT",
+                'contentType': 'application/json',
+                'dataType': 'json',
+                'data': JSON.stringify(name),
+                'success': function(data) {
+                    for (var i = 0; i < data.length; i++) {
+                        var ageRating = $('#ageRatings');
+                        ageRating.append('<li>' + data[i].ageRatingName + '</li>');
+                        ageRating.append('<button class="deleteAgeRating" id="button" value="' + data[i].id + '">Delete</button>')
+                        setClickOnDeleteAgeRating();
+
+                    }
+                    location.reload();
+                },
+                'error': function(error) {
+                    alert(JSON.parse(error.responseText).message);
+                }
+
+
+
+            })
+
+
+        })
+
+        function setClickOnDeleteAgeRating() {
+            $('.deleteAgeRating').click(function() {
+                var token = sessionStorage.getItem('A-Token')
+                var deleteAgeRating = {
+                    'id': this.value
+                }
+                console.log(deleteAgeRating)
+                $.ajax({
+                    'url': 'http://localhost:8080/ageRating',
+                    'type': "DELETE",
+                    'contentType': 'application/json',
+                    'dataType': 'json',
+                    'data': JSON.stringify(deleteAgeRating),
+                    'headers': {
+                        'A-token': token
+
+                    },
+                    'success': function() {
+                        $('#ageRatings').empty();
+                        getAgeRatings();
+                    },
+                    'error': function(error) {
+                        alert(JSON.parse(error.responseText).message);
+                    }
+
+                })
+            })
+        }
+
+
+
+        function getActors() {
+            $.ajax({
+                'url': 'http://localhost:8080/actors',
+                'type': "GET",
+                'contentType': 'application/json',
+                'success': function(data) {
+                    for (var i = 0; i < data.length; i++) {
+                        var actor = $('#actors');
+                        actor.append('<li>' + data[i].firstName + " " + data[i].secondName + " " + data[i].age + '</li>');
+                        actor.append('<button class="deleteActor" id="button"  value="' + data[i].id + '">Delete</button>')
+                        setClickOnDeleteActor();
+                    }
+
+                },
+                'error': function(error) {
+                    alert(JSON.parse(error.responseText).message);
+                }
+            });
+        }
+        getActors();
+
+        $('#addActor').click(function() {
+            var firstName = $('#actorsFirstName').val();
+            var secondName = $('#actorsLastName').val();
+            var age = $('#actorsAge').val();
+            var actor = {
+                firstName,
+                secondName,
+                age
+            }
+
+            $.ajax({
+                'url': 'http://localhost:8080/actors',
+                'type': "PUT",
+                'contentType': 'application/json',
+                'dataType': 'json',
+                'data': JSON.stringify(actor),
+                'success': function(data) {
+                    for (var i = 0; i < data.length; i++) {
+                        var actor = $('#actors');
+                        actor.append('<li>' + data[i].firstName + " " + data[i].secondName + " " + data[i].age + '</li>');
+                        actor.append('<button class="deleteActor" id="button"  value="' + data[i].id + '">Delete</button>')
+
+                        setClickOnDeleteActor();
+
+                    }
+                    location.reload();
+                },
+                'error': function(error) {
+                    alert(JSON.parse(error.responseText).message);
+                }
+
+
+
+            })
+
+
+        })
+
+        function setClickOnDeleteActor() {
+            $('.deleteActor').click(function() {
+                var token = sessionStorage.getItem('A-Token')
+                var deleteActor = {
+                    'id': this.value
+                }
+                console.log(deleteActor)
+                $.ajax({
+                    'url': 'http://localhost:8080/actors',
+                    'type': "DELETE",
+                    'contentType': 'application/json',
+                    'dataType': 'json',
+                    'data': JSON.stringify(deleteActor),
+                    'headers': {
+                        'A-token': token
+
+                    },
+                    'success': function() {
+                        $('#actors').empty();
+                        getActors();
+                    },
+                    'error': function(error) {
+                        alert(JSON.parse(error.responseText).message);
+                    }
+
+                })
+            })
+        }
+
+
+        function getGenres() {
+            $.ajax({
+                'url': 'http://localhost:8080/genre',
+                'type': "GET",
+                'contentType': 'application/json',
+                'success': function(data) {
+                    for (var i = 0; i < data.length; i++) {
+                        var list = $('#genres');
+                        list.append('<li>' + data[i].genreName + '</li>');
+                        list.append('<button class="deleteGenre" id="button"  value="' + data[i].id + '">Delete</button>')
+
+                    }
+                    setClickOnDeleteGenre();
+                },
+                'error': function(error) {
+                    alert(JSON.parse(error.responseText).message);
+                }
+            });
+        }
+        getGenres();
+
+        $('#addGenre').click(function() {
+            var name = $('#genre').val();
+
+            $.ajax({
+                'url': 'http://localhost:8080/genre',
+                'type': "PUT",
+                'contentType': 'application/json',
+                'dataType': 'json',
+                'data': JSON.stringify(name),
+                'success': function(data) {
+                    for (var i = 0; i < data.length; i++) {
+                        var list = $('#genres');
+                        list.append('<li>' + data[i].genreName + '</li>');
+                        list.append('<button class="deleteGenre" id="button"  value="' + data[i].id + '">Delete</button>')
+
+                        setClickOnDeleteGenre();
+
+                    }
+                    location.reload();
+                },
+                'error': function(error) {
+                    alert(JSON.parse(error.responseText).message);
+                }
+
+
+
+            })
+
+
+        })
+
+        function setClickOnDeleteGenre() {
+            $('.deleteGenre').click(function() {
+                var token = sessionStorage.getItem('A-Token')
+                var deleteGenre = {
+                    'id': this.value
+                }
+                console.log(deleteGenre)
+                $.ajax({
+                    'url': 'http://localhost:8080/genre',
+                    'type': "DELETE",
+                    'contentType': 'application/json',
+                    'dataType': 'json',
+                    'data': JSON.stringify(deleteGenre),
+                    'headers': {
+                        'A-token': token
+
+                    },
+                    'success': function() {
+                        $('#genres').empty();
+                        getGenres();
+                    },
+                    'error': function(error) {
+                        alert(JSON.parse(error.responseText).message);
+                    }
+
+                })
+            })
+        }
+
+
+        function getStudios() {
+            $.ajax({
+                'url': 'http://localhost:8080/studio',
+                'type': "GET",
+                'contentType': 'application/json',
+                'success': function(data) {
+                    for (var i = 0; i < data.length; i++) {
+                        var list = $('#studios');
+                        list.append('<li>' + data[i].name + '</li>');
+                        list.append('<button class="deleteStudio" id="button"  value="' + data[i].id + '">Delete</button>')
+
+                    }
+                    setClickOnDeleteStudio();
+                },
+                'error': function(error) {
+                    alert(JSON.parse(error.responseText).message);
+                }
+            });
+        }
+        getStudios();
+
+        $('#addStudio').click(function() {
+            var name = $('#studio').val();
+
+            $.ajax({
+                'url': 'http://localhost:8080/studio',
+                'type': "PUT",
+                'contentType': 'application/json',
+                'dataType': 'json',
+                'data': JSON.stringify(name),
+                'success': function(data) {
+                    for (var i = 0; i < data.length; i++) {
+                        var list = $('#studios');
+                        list.append('<li>' + data[i].name + '</li>');
+                        list.append('<button class="deleteStudio" id="button"  value="' + data[i].id + '">Delete</button>')
+
+                        setClickOnDeleteStudio();
+
+                    }
+                    location.reload();
+                },
+                'error': function(error) {
+                    alert(JSON.parse(error.responseText).message);
+                }
+
+
+
+            })
+
+
+        })
+
+        function setClickOnDeleteStudio() {
+            $('.deleteStudio').click(function() {
+                var token = sessionStorage.getItem('A-Token')
+                var deleteStudio = {
+                    'id': this.value
+                }
+                console.log(deleteStudio)
+                $.ajax({
+                    'url': 'http://localhost:8080/studio',
+                    'type': "DELETE",
+                    'contentType': 'application/json',
+                    'dataType': 'json',
+                    'data': JSON.stringify(deleteStudio),
+                    'headers': {
+                        'A-token': token
+
+                    },
+                    'success': function() {
+                        $('#studios').empty();
+                        getStudios();
+                    },
+                    'error': function(error) {
+                        alert(JSON.parse(error.responseText).message);
+                    }
+
+                })
+            })
+        }
+
+        function getFilms() {
+            $.ajax({
+                'url': 'http://localhost:8080/film',
+                'type': "GET",
+                'contentType': 'application/json',
+                'success': function(data) {
+                    for (var i = 0; i < data.length; i++) {
+                        var list = $('#films');
+                        list.append('<li>' + data[i].filmName + " " + data[i].filmRating + " ,premier date:  " + data[i].premierDate + " ,producer: " + data[i].producer + '</li>');
+                        list.append('<button class="deleteFilm" id="button" value="' + data[i].id + '">Delete</button>')
+
+                        setClickOnDeleteFilm();
+                    }
+
+                },
+                'error': function(error) {
+                    alert(JSON.parse(error.responseText).message);
+                }
+            });
+        }
+        getFilms();
+
+        $('#addFilm').click(function() {
+            var filmName = $('#filmName').val();
+            var filmRating = $('#filmRating').val();
+            var premierDate = $('#premierDate').val();
+            var producer = $('#producer').val();
+            var film = {
+                filmName,
+                filmRating,
+                premierDate,
+                producer
+
+            }
+
+            $.ajax({
+                'url': 'http://localhost:8080/film',
+                'type': "PUT",
+                'contentType': 'application/json',
+                'dataType': 'json',
+                'data': JSON.stringify(film),
+                'success': function(data) {
+                    for (var i = 0; i < data.length; i++) {
+                        var list = $('#films');
+                        list.append('<li>' + data[i].filmName + " " + data[i].filmRating + " ,premier date:  " + data[i].premierDate + " ,producer: " + data[i].producer + '</li>');
+                        list.append('<button class="deleteFilm" id="button" value="' + data[i].id + '">Delete</button>')
+
+
+                        setClickOnDeleteFilm();
+
+                    }
+                    location.reload();
+                },
+                'error': function(error) {
+                    alert(JSON.parse(error.responseText).message);
+                }
+
+
+
+            })
+
+
+        })
+
+        function setClickOnDeleteFilm() {
+            $('.deleteFilm').click(function() {
+                var token = sessionStorage.getItem('A-Token')
+                var deleteFilm = {
+                    'id': this.value
+                }
+                console.log(deleteFilm)
+                $.ajax({
+                    'url': 'http://localhost:8080/film',
+                    'type': "DELETE",
+                    'contentType': 'application/json',
+                    'dataType': 'json',
+                    'data': JSON.stringify(deleteFilm),
+                    'headers': {
+                        'A-token': token
+
+                    },
+                    'success': function() {
+                        $('#films').empty();
+                        getFilms();
+                    },
+                    'error': function(error) {
+                        alert(JSON.parse(error.responseText).message);
+                    }
+
+                })
+            })
+        }
+
+        function getUsers() {
+            var token = sessionStorage.getItem('A-Token')
+            $.ajax({
+                'url': 'http://localhost:8080/user',
+                'type': "GET",
+                'contentType': 'application/json',
+                'headers': {
+                    'A-token': token
+
+                },
+                'success': function(data) {
+                    for (var i = 0; i < data.length; i++) {
+                        var list = $('#users');
+                        list.append('<li>' + data[i].firstName + " " + data[i].lastName + " ,email:  " + data[i].email + " role: " + data[i].role + '</li>');
+                        list.append('<button class="deleteUser" id="button" value="' + data[i].id + '">Delete</button>')
+
+                        setClickOnDeleteUser();
+                    }
+
+                },
+                'error': function(error) {
+                    var list = $('#users');
+                    list.append('<p>' + JSON.parse(error.responseText).message + " ,log in as admin to see this page" + '</p>');
+                }
+            });
+        }
+        getUsers();
+
+        $('#addUser').click(function() {
+
+            var email = $('#email').val();
+            var password = $('#password').val();
+            var nickname = $('#nickname').val();
+            var firstName = $('#firstName').val();
+            var lastName = $('#lastName').val();
+            var role = $('#role').val();
+
+
+
+            var newUser = {
+                'email': email,
+                'password': password,
+                'nickname': nickname,
+                'firstName': firstName,
+                'lastName': lastName,
+                'role': role
+
+            }
+
+            console.log(newUser);
+
+            $.ajax({
+                'url': 'http://localhost:8080/user',
+                'type': "PUT",
+                'contentType': 'application/json',
+                'dataType': 'json',
+                'data': JSON.stringify(newUser),
+                'success': function(data) {
+                    for (var i = 0; i < data.length; i++) {
+                        var list = $('#users');
+                        list.append('<li>' + data[i].firstName + " " + data[i].lastName + " ,email:  " + data[i].email + '</li>');
+                        list.append('<button class="deleteUser" id="button" value="' + data[i].id + '">Delete</button>')
+
+                        setClickOnDeleteUser();
+                    }
+                    location.reload();
+                },
+
+                'error': function(error) {
+                    alert(JSON.parse(error.responseText).message);
+                }
+
+            })
+        })
+
+        function setClickOnDeleteUser() {
+            $('.deleteUser').click(function() {
+                var token = sessionStorage.getItem('A-Token')
+                var deleteUser = {
+                    'id': this.value
+                }
+                console.log(deleteUser)
+                $.ajax({
+                    'url': 'http://localhost:8080/user',
+                    'type': "DELETE",
+                    'contentType': 'application/json',
+                    'dataType': 'json',
+                    'data': JSON.stringify(deleteUser),
+                    'headers': {
+                        'A-token': token
+
+                    },
+                    'success': function() {
+                        $('#users').empty();
+                        getUsers();
+                    },
+                    'error': function(error) {
+                        alert(JSON.parse(error.responseText).message);
+                    }
+
+                })
+            })
+        }
+
+    </script>
+</body>
+
+</html>

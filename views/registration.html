@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Registration</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body background="image/bd2.png">
+    <header>
+
+        <div class="topnav" id="myTopnav">
+            <h2>Movie Blog</h2>
+            <a href="index.html">Home</a>
+            <a href="film.html">Films</a>
+            <a href="about.html">About</a>
+            <a id="sign" href="sign_up.html">Sign up</a>
+        </div>
+    </header>
+    <div class="container" id="main">
+        <h2>Registration</h2>
+        <div class="reg-form">
+            <div class="form-row">
+                <label>Enter email</label>
+                <input type="email" id="email"><br>
+            </div>
+            <div class="form-row">
+                <label>Enter password</label>
+                <input type="password" id="password"><br>
+            </div>
+            <div class="form-row">
+                <label>Enter nickname</label>
+                <input type="text" id="nickname"><br>
+            </div>
+            <div class="form-row">
+                <label>Enter your first name </label>
+                <input type="text" id="firstName"><br>
+            </div>
+            <div class="form-row">
+                <label>Enter your last name</label>
+                <input type="text" id="lastName"><br>
+            </div>
+
+            <div class="form-row">
+                <label>Enter country</label>
+                <select id="country">
+                
+                </select>
+            </div>
+
+            <label>Load your photo</label>
+            <input type="file" id="file">
+            <button onclick="readFile(document.getElementById('file'))" class="button">Upload</button><br>
+            <button id="reg" class="button">Registrate</button>
+        </div>
+    </div>
+    <footer>
+        <p>Made by YYS</p>
+    </footer>
+    <script>
+        const USER_PHOTO = null;
+
+        function getCountries() {
+            $.ajax({
+                'url': 'http://localhost:8080/country',
+                'type': "GET",
+                'contentType': 'application/json',
+                'success': function(data) {
+                    for (var i = 0; i < data.length; i++) {
+                        var country = $('#country');
+                        country.append('<option  value="' + data[i].id + '">' + data[i].name + ' </option>');
+                    }
+                }
+            });
+        }
+        getCountries();
+
+
+
+        function readFile(object) {
+            var file = object.files[0];
+            var reader = new FileReader();
+
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+                console.log("uploading..");
+
+                var base64picture = reader.result;
+                USER_PHOTO = base64picture;
+
+                return;
+
+            }
+        }
+
+        $("#reg").click(() => {
+            і
+            let email = $('#email').val(),
+                password = $('#password').val(),
+                nickname = $('#nickname').val(),
+                firstName = $('#firstName').val(),
+                lastName = $('#lastName').val(),
+                role = "ROLE_USER",
+                country = $('#country').val();
+
+
+            var newUser = {
+                'email': email,
+                'password': password,
+                'nickname': nickname,
+                'firstName': firstName,
+                'lastName': lastName,
+                'role': role,
+                'photo': USER_PHOTO,
+                'country_id': country
+
+            }
+
+            console.log(newUser);
+
+            $.ajax({
+                'url': 'http://localhost:8080/user',
+                'type': "PUT",
+                'contentType': 'application/json',
+                'dataType': 'json',
+                'data': JSON.stringify(newUser),
+                'success': function(data) {
+                    console.log("success")
+                    alert("Now you are registrated")
+                    location = "index.html"
+
+                },
+
+                'error': function(error) {
+                    alert(JSON.parse(error.responseText).message);
+                }
+
+            })
+        })
+
+    </script>
+
+</body>
+
+</html>

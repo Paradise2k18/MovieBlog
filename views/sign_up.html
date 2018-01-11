@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Registration</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body background="image/bd2.png">
+    <header>
+
+        <div class="topnav" id="myTopnav">
+            <h2>Movie Blog</h2>
+            <a href="index.html">Home</a>
+            <a href="film.html">Films</a>
+            <a href="about.html">About</a>
+            <a id="sign" href="sign_up.html">Sign up</a>
+        </div>
+    </header>
+    <div class="container" id="main">
+        <h2>Sign up</h2><br>
+        <div id="login-form">
+            <div class="form-row">
+                <label>Login:</label>
+                <input type="email" id="login"><br>
+            </div>
+            <div class="form-row">
+                <label>Password:</label>
+                <input type="password" id="password"><br>
+                <button id="loginBtn" class="button">Login</button>
+            </div>
+
+
+
+        </div>
+        <p><a href="registration.html">Not registrated?</a></p>
+
+    </div>
+    <footer>
+        <p>Made by YYS</p>
+    </footer>
+    <script>
+        $('#loginBtn').click(function() {
+            var login = $('#login').val();
+            var password = $('#password').val();
+            var loginReq = {
+                email: login,
+                password,
+            };
+
+            $.ajax({
+                'url': 'http://localhost:8080/login',
+                'type': "POST",
+                'contentType': 'application/json',
+                'data': JSON.stringify(loginReq),
+                'error': function(error) {
+                    alert("Incorrect login or password")
+
+                },
+                'success': function(data) {
+                    console.log('lala', data)
+                    sessionStorage.setItem('A-Token', data);
+                    alert('Welcome to our webSite')
+                    location = "index.html"
+
+                }
+            });
+
+            function remove() {
+                let token = sessionStorage.getItem('A-Token')
+
+
+            }
+        });
+
+    </script>
+
+</body>
+
+</html>

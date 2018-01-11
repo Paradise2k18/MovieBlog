@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Films</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body background="image/bd2.png">
+    <header>
+
+        <div class="topnav" id="myTopnav">
+            <h2>Movie Blog</h2>
+            <a href="index.html">Home</a>
+            <a href="film.html">Films</a>
+            <a href="about.html">About</a>
+            <a id="sign" href="sign_up.html">Sign up</a>
+        </div>
+    </header>
+    <div class="container" id="main">
+
+        <input class="search" id="search" type="search" placeholder="Search films">
+        <button id="sendSearchReq" class="button">Search</button>
+
+        <h3>Search results</h3>
+        <div>
+
+            <table id="films">
+                <tr>
+                    <th>Film</th>
+                    <th>Rating</th>
+                    <th>PremierDate</th>
+                    <th>Producer</th>
+                </tr>
+
+
+            </table>
+
+        </div>
+    </div>
+
+    <footer>
+        <p>Made by YYS</p>
+    </footer>
+    <script>
+        $('#sendSearchReq').click(function() {
+
+            $('#films tr td').remove();
+            var searchRequest = $('#search').val();
+
+            $.ajax({
+                'url': 'http://localhost:8080/film/search',
+                'type': "POST",
+                'contentType': 'application/json',
+                'dataType': 'json',
+                'data': JSON.stringify(searchRequest),
+
+                'success': function(data) {
+                    for (var i = 0; i < data.length; i++) {
+                        var film = $('#films');
+                        
+                        film.append('<tr> <td>' + data[i].filmName + '</td>' + '<td>' + data[i].filmRating + '<td>' + data[i].premierDate + '</td>' + '<td>' + data[i].producer + '</td></tr>');
+
+                    }
+                    if (data.length == 0) {
+                        alert("No films found")
+                    }
+                },
+                'error': function(error) {
+
+                    alert(JSON.parse(error.responseText).message);
+                }
+
+            })
+
+
+
+
+
+        })
+
+    </script>
+</body>
+
+</html>
